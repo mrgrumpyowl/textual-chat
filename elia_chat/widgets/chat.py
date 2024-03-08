@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from langchain.chat_models.base import BaseChatModel
 from langchain.llms.base import LLM
+from langchain.prompts.chat import ChatPromptTemplate
 from langchain.schema import (
     AIMessage,
     BaseMessage,
@@ -214,17 +215,20 @@ class Chat(Widget):
         await self.chat_container.mount(response_chatbox)
 
         if isinstance(llm, Anthropic):
-            async for text in llm.messages.stream(
-                max_tokens=selected_model.token_limit,
-                messages=[
-                    {"role": m.type, "content": m.content} for m in trimmed_messages
-                ],
-                model=selected_model.name,
-            ).text_stream:
-                response_chatbox.append_chunk(text)
+            prompt = ChatPromptTemplate.from_messages(trimmed_messages)
+            chain = prompt | llm
+            async for chunk in chain.astream({}):
+                if isinstance(chunk, BaseMessageChunk):
+                    token_str = chunk.content
+                else:
+                    token_str = str(chunk)
+                response_chatbox.append_chunk(token_str)
+                scroll_y = self.chat_container.scroll_y
+                max_scroll_y = self.chat_container.max_scroll_y
+                if scroll_y in range(max_scroll_y - 3, max_scroll_y + 1):
+                    self.chat_container.scroll_end(animate=False)
         else:
             streaming_response = llm.astream(input=trimmed_messages)
-            # TODO - ensure any metadata in streaming response is passed through
             async for token in streaming_response:
                 if isinstance(token, BaseMessageChunk):
                     token_str = token.content

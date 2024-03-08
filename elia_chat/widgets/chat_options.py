@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict
 
+from langchain_anthropic import ChatAnthropic
 from langchain.callbacks import AsyncIteratorCallbackHandler
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -48,8 +49,22 @@ DEFAULT_MODEL = GPTModel(
     ),
     token_limit=4096,
 )
+CLAUDE_MODEL = GPTModel(
+    name="claude-3-opus-20240229",
+    icon="🤖",
+    provider="Anthropic",
+    product="Claude",
+    description="Anthropic's latest Claude model.",
+    css_class="claude",
+    model=ChatAnthropic(
+        model_name="claude-3-opus-20240229",
+        temperature=0,
+    ),
+    token_limit=200000,
+)
 AVAILABLE_MODELS = [
     DEFAULT_MODEL,
+    CLAUDE_MODEL,
     GPTModel(
         name="gpt-4-turbo",
         icon="🧠",
@@ -110,7 +125,7 @@ class ModelPanel(Static):
         self.set_class(value, "selected")
 
 
-class ModelSet(Horizontal, can_focus=True):
+class ModelSet(Horizontal):
     BINDINGS = [
         Binding(key="left", action="left", description="Previous model"),
         Binding(key="right", action="right", description="Next model"),
@@ -122,6 +137,10 @@ class ModelSet(Horizontal, can_focus=True):
         def __init__(self, model: GPTModel):
             super().__init__()
             self.model = model
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.can_focus = True
 
     @property
     def panels(self) -> list[ModelPanel]:

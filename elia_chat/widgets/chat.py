@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import time
+from anthropic import Anthropic
 from dataclasses import dataclass
 
 from langchain.chat_models.base import BaseChatModel
@@ -190,8 +191,6 @@ class Chat(Widget):
             max_tokens=selected_model.token_limit,
             preserve_system_message=True,
         )
-        streaming_response = llm.astream(input=trimmed_messages)
-        # TODO - ensure any metadata available in streaming response is passed through
         message = AIMessage(
             content="",
             additional_kwargs={
@@ -203,6 +202,7 @@ class Chat(Widget):
                 "recipient": None,
             },
         )
+
         assert self.chat_data.model_name is not None
         response_chatbox = Chatbox(
             message=message,
@@ -212,16 +212,29 @@ class Chat(Widget):
             self.chat_container is not None
         ), "Textual has mounted container at this point in the lifecycle."
         await self.chat_container.mount(response_chatbox)
-        async for token in streaming_response:
-            if isinstance(token, BaseMessageChunk):
-                token_str = token.content
-            else:
-                token_str = str(token)
-            response_chatbox.append_chunk(token_str)
-            scroll_y = self.chat_container.scroll_y
-            max_scroll_y = self.chat_container.max_scroll_y
-            if scroll_y in range(max_scroll_y - 3, max_scroll_y + 1):
-                self.chat_container.scroll_end(animate=False)
+
+        if isinstance(llm, Anthropic):
+            async for text in llm.messages.stream(
+                max_tokens=selected_model.token_limit,
+                messages=[
+                    {"role": m.type, "content": m.content} for m in trimmed_messages
+                ],
+                model=selected_model.name,
+            ).text_stream:
+                response_chatbox.append_chunk(text)
+        else:
+            streaming_response = llm.astream(input=trimmed_messages)
+            # TODO - ensure any metadata in streaming response is passed through
+            async for token in streaming_response:
+                if isinstance(token, BaseMessageChunk):
+                    token_str = token.content
+                else:
+                    token_str = str(token)
+                response_chatbox.append_chunk(token_str)
+                scroll_y = self.chat_container.scroll_y
+                max_scroll_y = self.chat_container.max_scroll_y
+                if scroll_y in range(max_scroll_y - 3, max_scroll_y + 1):
+                    self.chat_container.scroll_end(animate=False)
         self.post_message(
             self.AgentResponseComplete(
                 chat_id=self.chat_data.id,

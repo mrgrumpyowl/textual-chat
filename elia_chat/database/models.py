@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import SQLModel, Field, create_engine, Session, select, Relationship
 
 
-class MessageDao(SQLModel, table=True):
+class MessageDao(SQLModel, table=True):  # type: ignore[call-arg]
     __tablename__ = "message"
 
     id: int = Field(default=None, primary_key=True)
@@ -27,7 +27,7 @@ class MessageDao(SQLModel, table=True):
     recipient: str | None
 
 
-class ChatDao(SQLModel, table=True):
+class ChatDao(SQLModel, table=True):  # type: ignore[call-arg]
     __tablename__ = "chat"
 
     id: int = Field(default=None, primary_key=True)

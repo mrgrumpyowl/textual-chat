@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
+import anthropic
 import openai
 from textual.app import App
 
@@ -18,6 +19,7 @@ class Elia(App):
         """
         super().__init__()
         openai.api_key = os.getenv("OPENAI_API_KEY")
+        anthropic.api_key = os.getenv("ANTHROPIC_API_KEY")
         self.elia_context = context or EliaContext()
 
     def on_mount(self) -> None:

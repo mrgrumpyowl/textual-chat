@@ -11,7 +11,9 @@ from elia_chat.screens.message_info_modal import MessageInfo
 from elia_chat.time_display import format_timestamp
 
 
-class Chatbox(Widget, can_focus=True):
+class Chatbox(Widget):
+    can_focus = True
+
     BINDINGS = [Binding(key="d", action="details", description="Message details")]
 
     def __init__(

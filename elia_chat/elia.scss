@@ -3,6 +3,9 @@ $main-lighten-1: #7E3AF2;
 $main: #6C2BD9;
 $main-darken-1: #5521B5;
 $main-darken-2: #4A1D96;
+$anthropic: #ad8363;
+$anthropic-lighten-1: #c7a188;
+$anthropic-darken-1: #8f6b53;
 
 $left-border-trim: vkey $main-lighten-2 15%;
 
@@ -191,33 +194,49 @@ ModelPanel {
 ModelPanel.gpt35 {
   color: $text;
   background: $panel;
-  border: thick $accent;
+  border: thick $success;
 }
 
 ModelPanel.gpt35 :hover {
   background: $panel-lighten-1;
-  border: thick $accent-lighten-1;
+  border: thick $success-lighten-1;
 }
 
 ModelPanel.gpt35.selected {
-  background: $accent-darken-2;
-  border: thick $accent-lighten-1;
+  background: $success-darken-2;
+  border: thick $success-lighten-1;
 }
 
 ModelPanel.gpt4 {
   color: $text;
   background: $panel;
-  border: thick $success;
+  border: thick $accent;
 }
 
 ModelPanel.gpt4 :hover {
   background: $panel-lighten-1;
-  border: thick $success-lighten-1;
+  border: thick $accent-lighten-1;
 }
 
 ModelPanel.gpt4.selected {
-  background: $success-darken-2;
-  border: thick $success-lighten-1;
+  background: $accent-darken-2;
+  border: thick $accent-lighten-1;
+}
+
+ModelPanel.claude {
+  color: $text;
+  background: $panel;
+  border: thick $anthropic;
+}
+
+ModelPanel.claude :hover {
+  background: $panel-lighten-1;
+  border: thick $anthropic-lighten-1;
+}
+
+ModelPanel.claude.selected {
+  background: $anthropic-darken-1;
+  border: thick $anthropic-lighten-1;
 }
 
 Footer {

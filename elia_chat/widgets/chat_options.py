@@ -49,6 +49,21 @@ DEFAULT_MODEL = GPTModel(
     ),
     token_limit=4096,
 )
+ADVANCED_MODEL = GPTModel(
+    name="gpt-4-turbo",
+    icon="🧠",
+    provider="OpenAI",
+    product="ChatGPT",
+    description="The most powerful ChatGPT model, capable of "
+    "complex tasks which require advanced reasoning.",
+    css_class="gpt4",
+    model=ChatOpenAI(
+        model_name="gpt-4-turbo",
+        streaming=True,
+        callbacks=[callback],
+    ),
+    token_limit=128000,
+)
 CLAUDE_MODEL = GPTModel(
     name="claude-3-opus-20240229",
     icon="🤖",
@@ -64,22 +79,8 @@ CLAUDE_MODEL = GPTModel(
 )
 AVAILABLE_MODELS = [
     DEFAULT_MODEL,
+    ADVANCED_MODEL,
     CLAUDE_MODEL,
-    GPTModel(
-        name="gpt-4-turbo",
-        icon="🧠",
-        provider="OpenAI",
-        product="ChatGPT",
-        description="The most powerful ChatGPT model, capable of "
-        "complex tasks which require advanced reasoning.",
-        css_class="gpt4",
-        model=ChatOpenAI(
-            model_name="gpt-4-1106-preview",
-            streaming=True,
-            callbacks=[callback],
-        ),
-        token_limit=128000,
-    ),
 ]
 MODEL_MAPPING: Dict[str, GPTModel] = {model.name: model for model in AVAILABLE_MODELS}
 
